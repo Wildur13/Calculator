@@ -3,6 +3,7 @@ from functools import partial
 # from antlr4 import Lexer, Parser, ParseTreeVisitor
 from calcul.calculatorS import Ui_calculator
 import math
+from calcul.search import Function
 
 
 class Calculator(Ui_calculator, QtWidgets.QWidget):
@@ -23,7 +24,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
         for i in range(self.gridLayout.count()):
             widget = self.gridLayout.itemAt(i).widget()
             if isinstance(widget, QtWidgets.QPushButton):
-                widget.setStyleSheet('QPushButton:hover {color: blue;'
+                widget.setStyleSheet('QPushButton:hover {color: White;'
                                      'background-color: white;}')
                 # widget.setFont(Custom_font)
             if isinstance(widget, QtWidgets.QPushButton) and widget.text().isdigit():
@@ -40,9 +41,10 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
         self.btn_virgule.clicked.connect(partial(self.btnOperationPressed, str(self.btn_virgule.text())))
         self.btn_del.clicked.connect(self.buttonPressed)
         self.btn_carrerac.clicked.connect(self.wurzel)
-        self.btn_sin.clicked.connect(self.sin)
-        self.bt_cos.clicked.connect(self.cos)
-        self.btn_tan.clicked.connect(self.tan)
+        self.btn_sin.clicked.connect(partial(self.btnOperationPressed, 'sin('))
+        self.bt_cos.clicked.connect(partial(self.btnOperationPressed, 'cos('))
+        self.btn_tan.clicked.connect(partial(self.btnOperationPressed, 'tan('))
+        self.btn_par_d.clicked.connect(partial(self.btnOperationPressed, str(self.btn_par_d.text())))
         self.btn_log.clicked.connect(self.log)
         self.btn_ln.clicked.connect(self.ln)
         self.btn_pourcentage.clicked.connect(partial(self.btnOperationPressed, str(self.btn_pourcentage.text())))
@@ -54,6 +56,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
     def setupRaccourciClavier(self):
         for btn in range(10):
             QtWidgets.QShortcut(QtGui.QKeySequence(str(btn)), self, partial(self.btnNombrePressed, str(btn)))
+        # for btns in :
 
         QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_plus.text())), self, partial(self.btnOperationPressed, str(self.btn_plus.text())))
         QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_moins.text())), self, partial(self.btnOperationPressed, str(self.btn_moins.text())))
@@ -62,6 +65,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
         QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self, self.calculOperation)
         QtWidgets.QShortcut(QtGui.QKeySequence('Del'), self, self.supprimerResultat)
         QtWidgets.QShortcut(QtGui.QKeySequence('Esc'), self, self.close)
+        QtWidgets.QShortcut(QtGui.QKeySequence('Backspace'), self, self.buttonPressed)
         QtWidgets.QShortcut(QtGui.QKeySequence('.'), self, partial(self.btnOperationPressed, str(self.btn_virgule.text())))
 
     def buttonPressed(self):
@@ -116,8 +120,10 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
 
         # On additionne l'operation en cours avec le texte dans le resultat
         # et on ajoute a la fin le signe de l'operation qu'on a choisie
-        self.resultat.setText(operationText + resultats + operation)
-
+        if resultats == '0':
+            self.resultat.setText(operationText + operation)
+        else:
+            self.resultat.setText(operationText + resultats + operation)
     def wurzel(self):
         get = (self.resultat.text())
         self.operation.setText('√' + str(get))
@@ -127,7 +133,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
         else:
             self.resultat.setText(res)
 
-    def sin(self):
+    '''def sin(self):
         state = self.btn_sin.text()
         get = (self.resultat.text())
         self.operation.setText(state + '(' + str(get) + ')')
@@ -165,7 +171,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
             self.resultat.setText(res[:-2])
         else:
             self.resultat.setText(res)
-
+    '''
     def log(self):
         state = self.btn_log.text()
         get = (self.resultat.text())
@@ -182,10 +188,11 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
     def ln(self):
         state = self.btn_ln.text()
         get = (self.resultat.text())
-        self.operation.setText(state + '(' + str(get) + ')')
         if state == 'ln':
+            self.operation.setText(state + '(' + str(get) + ')')
             res = str(math.log(eval(str(get)), 2.7182818281))
         else:
+            self.operation.setText('e^(' + str(get) + ')')
             res = str(math.pow(10, eval(str(get))))
         if res.endswith('.0'):
             self.resultat.setText(res[:-2])
@@ -206,13 +213,23 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
         # au LineEdit operation
         str(self.operation.setText(self.operation.text() + resultats))
         res = self.operation.text()
-        # On evalue le resultat de l'operation
-        if res.endswith('%'):
+        if res.startswith('sin'):
+            resultatOperation = Function.sin(res)
+            self.resultat.setText(str(resultatOperation))
+        elif res.startswith('cos'):
+            resultatOperation = Function.cos(res)
+            self.resultat.setText(str(resultatOperation))
+        elif res.startswith('tan'):
+            resultatOperation = Function.tan(res)
+            self.resultat.setText(str(resultatOperation))
+        elif res.endswith('%'):
             resultatOperation = str(float(res[:-1]) / 100)
             if resultatOperation.endswith('.0'):
                 self.resultat.setText(resultatOperation[:-2])
             else:
                 self.resultat.setText(str(resultatOperation))
+        elif Function.find(res):
+            print(f'{res} is not a Function')
         else:
             resultatOperation = str(eval(str(res)))
             if resultatOperation.endswith('.0'):
@@ -222,11 +239,11 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
 
     def css(self):
         self.setStyleSheet('''
-        background-color: gray;
+        background-color: #86c2fe;
         ''')
         self.resultat.setStyleSheet('''
-        background-color: white;
-        color: red;
+        background-color: White;
+        color: sky;
         ''')
         self.operation.setStyleSheet('''
         background-color: white;
