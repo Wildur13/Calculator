@@ -19,10 +19,11 @@ class Function:
         end1 = expr.endswith(')')
         start2 = re.search(r'cos', expr)
         start3 = re.search(r'tan', expr)
+        op = ['+', '-', '*', '/']
         try:
             if start1 and end1 and re.search(r'[0-9]+', expr):
                 if start2 and not start3:
-                    return math.sin(math.cos(float(get.group())))
+                    return eval(str(math.sin(math.cos(float(get.group())))))
                 elif start3 and not start2:
                     return math.sin(math.tan(float(get.group())))
                 elif start2 and start3:
@@ -33,7 +34,10 @@ class Function:
                 else:
                     return math.sin(float(get.group()))
             elif start0:
-                
+                for o in op:
+                    ope = expr.find(o)
+                    cal = re.search(r'[0-9]+', expr)
+
         except NotImplementedError:
             print('Not a sin function')
 
@@ -58,10 +62,10 @@ class Function:
     @staticmethod
     def find(expr=''):
         give = False
-        op = ['sin', 'cos', 'tan', 'log', 'ln', '√', 'e^', 'sin^-1', 'cos^-1', 'tan^-1', '10^']
+        func = ['sin', 'cos', 'tan', 'log', 'ln', '√', 'e^', 'sin^-1', 'cos^-1', 'tan^-1', '10^']
         # i = 0
-        for ope in op:
-            if re.search(ope, expr):
+        for f in func:
+            if re.search(f, expr):
                 give = True
                 break
         return give
@@ -113,4 +117,3 @@ class Function:
             print('Not a sin function')
 
 
-print(Function.find('15+cos(45)'))

@@ -58,10 +58,14 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
             QtWidgets.QShortcut(QtGui.QKeySequence(str(btn)), self, partial(self.btnNombrePressed, str(btn)))
         # for btns in :
 
-        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_plus.text())), self, partial(self.btnOperationPressed, str(self.btn_plus.text())))
-        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_moins.text())), self, partial(self.btnOperationPressed, str(self.btn_moins.text())))
-        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_div.text())), self, partial(self.btnOperationPressed, str(self.btn_div.text())))
-        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_mult.text())), self, partial(self.btnOperationPressed, str(self.btn_mult.text())))
+        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_plus.text())), self,
+                            partial(self.btnOperationPressed, str(self.btn_plus.text())))
+        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_moins.text())), self,
+                            partial(self.btnOperationPressed, str(self.btn_moins.text())))
+        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_div.text())), self,
+                            partial(self.btnOperationPressed, str(self.btn_div.text())))
+        QtWidgets.QShortcut(QtGui.QKeySequence(str(self.btn_mult.text())), self,
+                            partial(self.btnOperationPressed, str(self.btn_mult.text())))
         QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self, self.calculOperation)
         QtWidgets.QShortcut(QtGui.QKeySequence('Del'), self, self.supprimerResultat)
         QtWidgets.QShortcut(QtGui.QKeySequence('Esc'), self, self.close)
@@ -124,6 +128,7 @@ class Calculator(Ui_calculator, QtWidgets.QWidget):
             self.resultat.setText(operationText + operation)
         else:
             self.resultat.setText(operationText + resultats + operation)
+
     def wurzel(self):
         get = (self.resultat.text())
         self.operation.setText('√' + str(get))
